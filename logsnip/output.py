@@ -22,6 +22,7 @@ def write_output(
 
     Raises:
         ValueError: If fmt is not a supported format.
+        OSError: If the output file cannot be written.
     """
     if fmt not in SUPPORTED_FORMATS:
         raise ValueError(
@@ -36,7 +37,10 @@ def write_output(
     if output_path:
         dest = Path(output_path)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content + "\n", encoding="utf-8")
+        try:
+            dest.write_text(content + "\n", encoding="utf-8")
+        except OSError as e:
+            raise OSError(f"Failed to write output to '{output_path}': {e}") from e
     else:
         sys.stdout.write(content + "\n")
 
