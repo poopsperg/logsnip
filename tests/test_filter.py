@@ -70,6 +70,18 @@ def test_filter_by_exclude(sample_entries):
     assert all("connect" not in e.message for e in result)
 
 
+def test_filter_by_exclude_no_match(sample_entries):
+    """Excluding a pattern that matches nothing should return all entries."""
+    result = list(filter_by_exclude(sample_entries, r"timeout"))
+    assert len(result) == len(sample_entries)
+
+
+def test_filter_by_exclude_all_match(sample_entries):
+    """Excluding a pattern that matches everything should return empty list."""
+    result = list(filter_by_exclude(sample_entries, r"."))
+    assert result == []
+
+
 def test_apply_filters_combined(sample_entries):
     result = list(apply_filters(sample_entries, levels=["INFO"], pattern=r"retry"))
     assert len(result) == 1
