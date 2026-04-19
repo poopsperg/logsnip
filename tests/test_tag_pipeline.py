@@ -39,6 +39,20 @@ def test_run_pipeline_no_rules(sample_entries):
     assert all(t.tags == [] for t in result)
 
 
+def test_run_pipeline_multiple_tags_on_entry():
+    """An entry can match multiple rules and receive multiple tags."""
+    entry = LogEntry(timestamp=_ts(0), level="ERROR", message="disk full", line_number=1)
+    rules = [
+        TagRule(tag="err", level="ERROR"),
+        TagRule(tag="disk", pattern="disk"),
+    ]
+    opts = TagPipelineOptions(rules=rules)
+    result = run_tag_pipeline([entry], opts)
+    assert len(result) == 1
+    assert "err" in result[0].tags
+    assert "disk" in result[0].tags
+
+
 def test_summary_with_tags(sample_entries):
     rules = [TagRule(tag="err", level="ERROR"), TagRule(tag="warn", level="WARN")]
     opts = TagPipelineOptions(rules=rules)
