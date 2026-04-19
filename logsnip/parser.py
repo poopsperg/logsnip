@@ -53,3 +53,12 @@ def filter_by_range(
         if end and entry.timestamp > end:
             continue
         yield entry
+
+
+def count_by_minute(entries: Iterator[LogEntry]) -> dict[str, int]:
+    """Return a dict mapping 'YYYY-MM-DD HH:MM' to the number of log entries in that minute."""
+    counts: dict[str, int] = {}
+    for entry in entries:
+        key = entry.timestamp.strftime("%Y-%m-%d %H:%M")
+        counts[key] = counts.get(key, 0) + 1
+    return counts
