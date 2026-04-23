@@ -22,6 +22,8 @@ class AlertRule:
             return False
         if self._regex and not self._regex.search(entry.message):
             return False
+        if self.min_score is not None and (entry.score is None or entry.score < self.min_score):
+            return False
         return True
 
 
