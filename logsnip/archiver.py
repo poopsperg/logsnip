@@ -67,12 +67,18 @@ def serialize_archive(archive: Archive) -> bytes:
 
 def deserialize_archive(data: bytes, compressed: bool = True) -> Archive:
     if compressed:
-        buf = io.BytesIO(data)
-        with gzip.GzipFile(fileobj=buf, mode="rb") as gz:
-            raw = gz.read()
+        try:
+            buf = io.BytesIO(data)
+            with gzip.GzipFile(fileobj=buf, mode="rb") as gz:
+                raw = gz.read()
+        except (OSError, EOFError) as e:
+            raise ValueError(f"Failed to decompress archive data: {e}") from e
     else:
         raw = data
-    meta = json.loads(raw.decode())
+    try:
+        meta = json.loads(raw.decode())
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        raise ValueError(f"Failed to parse archive JSON: {e}") from e
     entries = [
         LogEntry(timestamp=datetime.fromisoformat(r["timestamp"]), level=r["level"], message=r["message"], line_number=r["line"])
         for r in meta["entries"]
