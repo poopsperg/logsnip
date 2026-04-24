@@ -90,3 +90,18 @@ def test_export_entries_invalid_format(sample_entries):
     opts = ExportOptions(fmt="xml")  # type: ignore
     with pytest.raises(ValueError, match="Unsupported"):
         export_entries(sample_entries, opts)
+
+
+def test_export_empty_entries():
+    """All export functions should handle an empty list without errors."""
+    empty = []
+    assert export_json(empty) == "[]"
+    assert export_jsonl(empty) == ""
+
+    csv_out = export_csv(empty)
+    lines = [l for l in csv_out.splitlines() if l.strip()]
+    assert len(lines) == 1  # header only
+
+    tsv_out = export_tsv(empty)
+    lines = [l for l in tsv_out.splitlines() if l.strip()]
+    assert len(lines) == 1  # header only
