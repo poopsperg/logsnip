@@ -42,6 +42,13 @@ def test_sample_every_nth_invalid(sample_entries):
         sample_every_nth(sample_entries, 0)
 
 
+def test_sample_every_nth_larger_than_list(sample_entries):
+    """When n exceeds list length, only the first entry should be returned."""
+    result = sample_every_nth(sample_entries, 10)
+    assert len(result) == 1
+    assert result[0].message == "msg 0"
+
+
 def test_sample_head_basic(sample_entries):
     result = sample_head(sample_entries, 3)
     assert len(result) == 3
@@ -55,6 +62,12 @@ def test_sample_head_zero(sample_entries):
 def test_sample_head_negative(sample_entries):
     with pytest.raises(ValueError):
         sample_head(sample_entries, -1)
+
+
+def test_sample_head_exceeds_length(sample_entries):
+    """Requesting more entries than available should return all entries."""
+    result = sample_head(sample_entries, 100)
+    assert result == sample_entries
 
 
 def test_sample_by_rate_full(sample_entries):
@@ -91,3 +104,10 @@ def test_apply_sampling_defaults(sample_entries):
     opts = SampleOptions()
     result = apply_sampling(sample_entries, opts)
     assert result == sample_entries
+
+
+def test_apply_sampling_empty_entries():
+    """apply_sampling should handle an empty list without errors."""
+    opts = SampleOptions(every_nth=2, max_entries=5)
+    result = apply_sampling([], opts)
+    assert result == []
