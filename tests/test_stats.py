@@ -74,3 +74,11 @@ def test_format_stats_contains_levels(sample_entries):
     text = format_stats(stats)
     assert "ERROR" in text
     assert "DEBUG" in text
+
+
+def test_format_stats_empty():
+    """format_stats should handle an empty stats object without crashing."""
+    stats = compute_stats([])
+    text = format_stats(stats)
+    assert "Total entries" in text
+    assert "0" in text
